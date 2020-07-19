@@ -7,15 +7,14 @@ fn main() {
     let mut args: Vec<String> = env::args().collect();
     args.remove(0);
 
-    for x in &args {
-        println!("{}", x);
+    if (&args).len() == 0 {
+        println!("Needs arguments");
+        return;
     }
-
     if (&args)[0] == "--help" {
         print_help();
         return;
     }
-
     if (&args).len() != 3 {
         println!("Incorrect # of params: {}", args.len());
         return;
@@ -44,9 +43,9 @@ fn fuck_wit_byte(b: u8, key: &[u8], encrypt: bool) -> u8 {
     let mut new_byte = Wrapping(b);
     for x in 0..key.len() {
         if encrypt {
-            new_byte += Wrapping(key[x]);
+            new_byte += Wrapping(key[x]) * Wrapping(key[(x + 1) % key.len()]);
         } else {
-            new_byte -= Wrapping(key[x]);
+            new_byte -= Wrapping(key[x]) * Wrapping(key[(x + 1) % key.len()]);
         }
     }
     return new_byte.0;
