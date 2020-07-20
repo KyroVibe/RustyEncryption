@@ -26,11 +26,9 @@ fn main() {
     let encrypt: bool = args[2] == "true";
 
     let mut f = File::open(&file_path).unwrap();
-    let buf_len = f.read_to_end(&mut buf).unwrap();
-    
-    for x in 0..buf_len {
-        buf[x] = fuck_wit_byte(buf[x], key.as_bytes(), encrypt);
-    }
+    f.read_to_end(&mut buf).expect("Whoop Idk what happened");
+
+    fuck_wit_byte(&mut buf, key.as_bytes(), encrypt);
 
     let mut encrypted_file = File::create(&file_path).unwrap();
     encrypted_file.write(buf.as_slice()).unwrap();
@@ -39,16 +37,16 @@ fn main() {
     // println!("{}", result);
 }
 
-fn fuck_wit_byte(b: u8, key: &[u8], encrypt: bool) -> u8 {
-    let mut new_byte = Wrapping(b);
-    for x in 0..key.len() {
-        if encrypt {
-            new_byte += Wrapping(key[x]) * Wrapping(key[(x + 1) % key.len()]);
-        } else {
-            new_byte -= Wrapping(key[x]) * Wrapping(key[(x + 1) % key.len()]);
+fn fuck_wit_byte(b: &mut Vec<u8>, key: &[u8], encrypt: bool) {
+    for i in 0..b.len() {
+        for x in 0..key.len() {
+            if encrypt {
+                b[i] = (Wrapping(b[i]) + (Wrapping(key[x]) * Wrapping(key[(x + 1) % key.len()]))).0;
+            } else {
+                b[i] = (Wrapping(b[i]) - (Wrapping(key[x]) * Wrapping(key[(x + 1) % key.len()]))).0;
+            }
         }
     }
-    return new_byte.0;
 }
 
 fn print_help() {
