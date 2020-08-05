@@ -7,15 +7,15 @@ fn main() {
     let mut args: Vec<String> = env::args().collect();
     args.remove(0);
 
-    if (&args).len() == 0 {
+    if args.len() == 0 {
         println!("Needs arguments");
         return;
     }
-    if (&args)[0] == "--help" {
+    if args[0] == "--help" {
         print_help();
         return;
     }
-    if (&args).len() != 3 {
+    if args.len() != 3 {
         println!("Incorrect # of params: {}", args.len());
         return;
     }
@@ -25,19 +25,19 @@ fn main() {
     let key = args[1].to_owned();
     let encrypt: bool = args[2] == "true";
 
-    let mut f = File::open(&file_path).unwrap();
-    f.read_to_end(&mut buf).expect("Whoop Idk what happened");
+    let mut f = File::open(&file_path).expect("Failed to open existing file");
+    f.read_to_end(&mut buf).expect("Failed to read existing file into buffer");
 
-    fuck_wit_byte(&mut buf, key.as_bytes(), encrypt);
+    shit_encryption(&mut buf, key.as_bytes(), encrypt);
 
-    let mut encrypted_file = File::create(&file_path).unwrap();
-    encrypted_file.write(buf.as_slice()).unwrap();
-    encrypted_file.flush().unwrap();
+    let mut encrypted_file = File::create(&file_path).expect("Failed to create output file");
+    encrypted_file.write(buf.as_slice()).expect("Failed to write to output file");
+    encrypted_file.flush().expect("Failed to flush writen bytes");
     
     // println!("{}", result);
 }
 
-fn fuck_wit_byte(b: &mut Vec<u8>, key: &[u8], encrypt: bool) {
+fn shit_encryption(b: &mut Vec<u8>, key: &[u8], encrypt: bool) {
     for i in 0..b.len() {
         for x in 0..key.len() {
             if encrypt {
